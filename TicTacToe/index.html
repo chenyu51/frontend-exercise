@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicTacTeo</title>
+    <style>
+        #container-box {
+            width: 312px;
+        }
+
+        .cell {
+            display: inline-block;
+            vertical-align: middle;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            background: greenyellow;
+            border: 2px solid green;
+            text-align: center;
+            font-size: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container-box"></div>
+    <script>
+        let color = 1
+        const pattern = [
+            [1, 0, 0],
+            [0, 2, 0],
+            [0, 0, 0],
+        ]
+
+        function show() {
+            const container = document.querySelector('#container-box')
+            container.innerHTML = ''
+            for (let y = 0; y < 3; y++) {
+                for (let x = 0; x < 3; x++) {
+                    const cell = document.createElement('div')
+                    cell.classList = 'cell'
+                    cell.innerHTML = pattern[y][x] === 1 ? '⭕️' :
+                        pattern[y][x] === 2 ? '❌' : ''
+                    // cell.onclick = function (x, y) {
+                    //     move(x, y)
+                    // }
+
+                    cell.addEventListener('click', () => move(x, y))
+                    container.appendChild(cell)
+                }
+            }
+        }
+
+        function move(x, y) {
+            color = 3 - color
+            if (pattern[y][x]) return
+            pattern[y][x] = color
+            const winner = win(color, { x, y })
+            show()
+            if (winner) {
+                const winColor = color === 1 ? '⭕️' : '❌'
+                alert(`${winColor}win`)
+            }
+        }
+
+        function win(color, { x, y }) {
+            let win = true
+
+            for (let i = 0; i < 3; i++) {
+                if (pattern[y][i] !== color) {
+                    win = false
+                }
+            }
+
+            win = true
+            for (let i = 0; i < 3; i++) {
+                if (pattern[i][x] !== color) {
+                    win = false
+                }
+            }
+
+            if (x === y) {
+                win = true
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i][i] !== color) {
+                        win = false
+                    }
+                }
+            }
+
+            if (x + y === 2) {
+                win = true
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i][2 - i] !== color) {
+                        win = false
+                    }
+                }
+            }
+
+            return win
+
+        }
+
+        show()
+
+
+
+    </script>
+</body>
+
+</html>
