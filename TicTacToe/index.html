@@ -29,8 +29,8 @@
     <script>
         let color = 1
         const pattern = [
-            [1, 0, 0],
-            [0, 2, 0],
+            [0, 0, 0],
+            [0, 0, 0],
             [0, 0, 0],
         ]
 
@@ -54,53 +54,112 @@
         }
 
         function move(x, y) {
-            color = 3 - color
             if (pattern[y][x]) return
+            color = 3 - color
             pattern[y][x] = color
-            const winner = win(color, { x, y })
             show()
-            if (winner) {
+            if (win(pattern, color, { x, y })) {
                 const winColor = color === 1 ? '⭕️' : '❌'
                 alert(`${winColor}win`)
             }
+            if (willWin(pattern, color)) {
+                const winColor = color === 1 ? '⭕️' : '❌'
+                console.log(`${winColor}will win`)
+            }
+
+            const best = bestChoise(pattern, color)
+            console.log(color === 1 ? '⭕️' : '❌', '最好选择是：', best)
+
+
+
         }
 
-        function win(color, { x, y }) {
-            let win = true
+        function win(collection, color, { x, y }) {
+            {
+                let win = true
 
-            for (let i = 0; i < 3; i++) {
-                if (pattern[y][i] !== color) {
-                    win = false
-                }
-            }
-
-            win = true
-            for (let i = 0; i < 3; i++) {
-                if (pattern[i][x] !== color) {
-                    win = false
-                }
-            }
-
-            if (x === y) {
-                win = true
                 for (let i = 0; i < 3; i++) {
-                    if (pattern[i][i] !== color) {
+                    if (collection[y][i] !== color) {
                         win = false
                     }
                 }
+
+                if (win) return win
+            }
+
+
+            {
+                let win = true
+                for (let i = 0; i < 3; i++) {
+                    if (collection[i][x] !== color) {
+                        win = false
+                    }
+                }
+
+                if (win) return win
+            }
+
+
+            if (x === y) {
+                let win = true
+                for (let i = 0; i < 3; i++) {
+                    if (collection[i][i] !== color) {
+                        win = false
+                    }
+                }
+                if (win) return win
             }
 
             if (x + y === 2) {
-                win = true
+                let win = true
                 for (let i = 0; i < 3; i++) {
-                    if (pattern[i][2 - i] !== color) {
+                    if (collection[i][2 - i] !== color) {
                         win = false
                     }
                 }
+                if (win) return win
             }
 
-            return win
+        }
 
+        function clone(obj) {
+            return JSON.parse(JSON.stringify(obj))
+        }
+
+        function willWin(collection, color) {
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 3; j++) {
+                    if (collection[i][j] !== 0) {
+                        continue
+                    }
+                    const temp = clone(collection)
+                    temp[i][j] = color
+                    if (win(temp, color, { x: j, y: i })) {
+                        return { x: j, y: i }
+                    }
+                }
+            }
+        }
+
+
+        function bestChoise(collection, color) {
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 3; j++) {
+                    if (collection[i][j] !== 0) {
+                        continue
+                    }
+
+                    if (willWin(temp, color, { x: j, y: i })) {
+                        return { x: j, y: i }
+                    }
+
+                    const temp = clone(collection)
+                    temp[i][j] = color
+                    if (willWin(temp, color, { x: j, y: i })) {
+                        return { x: j, y: i }
+                    }
+                }
+            }
         }
 
         show()
