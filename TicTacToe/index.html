@@ -36,9 +36,9 @@
         ]
 
         addEvent()
-        show()
+        show(pattern)
 
-        function show() {
+        function show(pattern) {
             const container = document.querySelector('#container-box')
             container.innerHTML = ''
             for (let y = 0; y < 3; y++) {
@@ -55,10 +55,9 @@
 
         function addEvent() {
             const button = document.querySelector('button')
-            console.log('---000----')
             button.onclick = function () {
-                const bstC = bestChoise(pattern, color)
-                const winColor = color === 1 ? '⭕️' : '❌'
+                const bstC = bestChoise(pattern, 3 - color)
+                const winColor = 3 - color === 1 ? '⭕️' : '❌'
                 console.log(bstC)
                 console.log(`${winColor}最好的选择是${bstC.point.x},${bstC.point.y},结果是${bstC.result}`)
             }
@@ -68,7 +67,7 @@
             if (pattern[y][x]) return
             color = 3 - color
             pattern[y][x] = color
-            show()
+            show(pattern)
             if (win(pattern, color, { x, y })) {
                 const winColor = color === 1 ? '⭕️' : '❌'
                 alert(`${winColor}win`)
@@ -188,12 +187,13 @@
         function willWin(collection, side) {
             for (i = 0; i < 3; i++) {
                 for (j = 0; j < 3; j++) {
-                    if (collection[i][j] === 0) {
-                        const temp = clone(collection)
-                        temp[i][j] = side
-                        if (win(temp, side, { x: j, y: i })) {
-                            return { x: j, y: i }
-                        }
+                    if (collection[i][j] === 0)
+                        continue;
+                    const temp = clone(collection)
+                    temp[i][j] = side
+                    // if (win(temp, side, { x: j, y: i })) {
+                    if (check(temp, side)) {
+                        return { x: j, y: i }
                     }
                 }
             }
@@ -202,6 +202,8 @@
 
         function bestChoise(collection, side) {
             let point = willWin(collection, side)
+            console.log(collection, point)
+            debugger
             if (point) {
                 return {
                     point: point,
@@ -214,19 +216,18 @@
 
             for (i = 0; i < 3; i++) {
                 for (j = 0; j < 3; j++) {
-                    if (collection[i][j] === 0) {
-                        let tmp = clone(collection)
-                        tmp[i][j] = side
-                        let opp = bestChoise(tmp, 3 - side)
-                        if (-opp.result >= result) {
-                            point = { x: j, y: i }
-                            result = -opp.result
-                        }
+                    if (collection[i][j] !== 0)
+                        continue;
+                    let tmp = clone(collection)
+                    tmp[i][j] = side
+                    let opp = bestChoise(tmp, 3 - side)
+                    if (-opp.result >= result) {
+                        point = { x: j, y: i }
+                        result = -opp.result
                     }
                 }
             }
 
-            console.log(point)
 
             return { point: point, result: point ? result : 0 }
         }
