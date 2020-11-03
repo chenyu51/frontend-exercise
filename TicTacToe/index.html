@@ -60,7 +60,7 @@
                 const bstC = bestChoise(pattern, color)
                 const winColor = color === 1 ? '⭕️' : '❌'
                 console.log(bstC)
-                console.log(`${winColor}最好的选择是${bstC.point.x},${bstC.point.x},结果是${bstC.result}`)
+                console.log(`${winColor}最好的选择是${bstC.point.x},${bstC.point.y},结果是${bstC.result}`)
             }
         }
 
@@ -182,21 +182,18 @@
         }
 
         function clone(obj) {
-            // console.log(1)
             return obj.map(el => [...el])
         }
 
         function willWin(collection, side) {
             for (i = 0; i < 3; i++) {
                 for (j = 0; j < 3; j++) {
-                    if (collection[i][j] !== 0) {
-                        continue
-                    }
-                    const temp = clone(collection)
-                    temp[i][j] = side
-                    if (check(temp, side)) {
-                        // if (win(temp, side, { x: j, y: i })) {
-                        return { x: j, y: i }
+                    if (collection[i][j] === 0) {
+                        const temp = clone(collection)
+                        temp[i][j] = side
+                        if (win(temp, side, { x: j, y: i })) {
+                            return { x: j, y: i }
+                        }
                     }
                 }
             }
@@ -217,14 +214,14 @@
 
             for (i = 0; i < 3; i++) {
                 for (j = 0; j < 3; j++) {
-                    if (collection[i][j] !== 0)
-                        continue;
-                    let tmp = clone(collection)
-                    tmp[i][j] = color
-                    let opp = bestChoise(tmp, 3 - side)
-                    if (-opp.result >= result) {
-                        point = { x: j, y: i }
-                        result = -opp.result
+                    if (collection[i][j] === 0) {
+                        let tmp = clone(collection)
+                        tmp[i][j] = side
+                        let opp = bestChoise(tmp, 3 - side)
+                        if (-opp.result >= result) {
+                            point = { x: j, y: i }
+                            result = -opp.result
+                        }
                     }
                 }
             }
