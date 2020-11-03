@@ -26,6 +26,7 @@
 
 <body>
     <div id="container-box"></div>
+    <button>获取提示</button>
     <script>
         let color = 1
         const pattern = [
@@ -33,6 +34,9 @@
             [0, 0, 0],
             [0, 0, 0],
         ]
+
+        addEvent()
+        show()
 
         function show() {
             const container = document.querySelector('#container-box')
@@ -43,13 +47,20 @@
                     cell.classList = 'cell'
                     cell.innerHTML = pattern[y][x] === 1 ? '⭕️' :
                         pattern[y][x] === 2 ? '❌' : ''
-                    // cell.onclick = function (x, y) {
-                    //     move(x, y)
-                    // }
-
                     cell.addEventListener('click', () => move(x, y))
                     container.appendChild(cell)
                 }
+            }
+        }
+
+        function addEvent() {
+            const button = document.querySelector('button')
+            console.log('---000----')
+            button.onclick = function () {
+                const bstC = bestChoise(pattern, color)
+                const winColor = color === 1 ? '⭕️' : '❌'
+                console.log(bstC)
+                console.log(`${winColor}最好的选择是${bstC.point.x},${bstC.point.x},结果是${bstC.result}`)
             }
         }
 
@@ -67,19 +78,14 @@
                 console.log(`${winColor}will win`)
             }
 
-            const best = bestChoise(pattern, color)
-            console.log(color === 1 ? '⭕️' : '❌', '最好选择是：', best)
-
-
-
         }
 
-        function win(collection, color, { x, y }) {
+        function win(collection, side, { x, y }) {
             {
                 let win = true
 
                 for (let i = 0; i < 3; i++) {
-                    if (collection[y][i] !== color) {
+                    if (collection[y][i] !== side) {
                         win = false
                     }
                 }
@@ -91,7 +97,7 @@
             {
                 let win = true
                 for (let i = 0; i < 3; i++) {
-                    if (collection[i][x] !== color) {
+                    if (collection[i][x] !== side) {
                         win = false
                     }
                 }
@@ -103,7 +109,7 @@
             if (x === y) {
                 let win = true
                 for (let i = 0; i < 3; i++) {
-                    if (collection[i][i] !== color) {
+                    if (collection[i][i] !== side) {
                         win = false
                     }
                 }
@@ -113,7 +119,60 @@
             if (x + y === 2) {
                 let win = true
                 for (let i = 0; i < 3; i++) {
-                    if (collection[i][2 - i] !== color) {
+                    if (collection[i][2 - i] !== side) {
+                        win = false
+                    }
+                }
+                if (win) return win
+            }
+
+        }
+
+        function check(collection, side) {
+            {
+
+                for (let j = 0; j < 3; j++) {
+                    let win = true
+                    for (let i = 0; i < 3; i++) {
+                        if (collection[j][i] !== side) {
+                            win = false
+                        }
+                    }
+                    if (win) return win
+                }
+
+            }
+
+
+            {
+
+                for (let j = 0; j < 3; j++) {
+                    let win = true
+                    for (let i = 0; i < 3; i++) {
+                        if (collection[i][j] !== side) {
+                            win = false
+                        }
+                    }
+                    if (win) return win
+                }
+
+            }
+
+
+            {
+                let win = true
+                for (let i = 0; i < 3; i++) {
+                    if (collection[i][i] !== side) {
+                        win = false
+                    }
+                }
+                if (win) return win
+            }
+
+            {
+                let win = true
+                for (let i = 0; i < 3; i++) {
+                    if (collection[i][2 - i] !== side) {
                         win = false
                     }
                 }
@@ -123,18 +182,20 @@
         }
 
         function clone(obj) {
-            return JSON.parse(JSON.stringify(obj))
+            // console.log(1)
+            return obj.map(el => [...el])
         }
 
-        function willWin(collection, color) {
+        function willWin(collection, side) {
             for (i = 0; i < 3; i++) {
                 for (j = 0; j < 3; j++) {
                     if (collection[i][j] !== 0) {
                         continue
                     }
                     const temp = clone(collection)
-                    temp[i][j] = color
-                    if (win(temp, color, { x: j, y: i })) {
+                    temp[i][j] = side
+                    if (check(temp, side)) {
+                        // if (win(temp, side, { x: j, y: i })) {
                         return { x: j, y: i }
                     }
                 }
@@ -142,27 +203,37 @@
         }
 
 
-        function bestChoise(collection, color) {
+        function bestChoise(collection, side) {
+            let point = willWin(collection, side)
+            if (point) {
+                return {
+                    point: point,
+                    result: 1
+                }
+            }
+
+
+            let result = -1
+
             for (i = 0; i < 3; i++) {
                 for (j = 0; j < 3; j++) {
-                    if (collection[i][j] !== 0) {
-                        continue
-                    }
-
-                    if (willWin(temp, color, { x: j, y: i })) {
-                        return { x: j, y: i }
-                    }
-
-                    const temp = clone(collection)
-                    temp[i][j] = color
-                    if (willWin(temp, color, { x: j, y: i })) {
-                        return { x: j, y: i }
+                    if (collection[i][j] !== 0)
+                        continue;
+                    let tmp = clone(collection)
+                    tmp[i][j] = color
+                    let opp = bestChoise(tmp, 3 - side)
+                    if (-opp.result >= result) {
+                        point = { x: j, y: i }
+                        result = -opp.result
                     }
                 }
             }
+
+            console.log(point)
+
+            return { point: point, result: point ? result : 0 }
         }
 
-        show()
 
 
 
