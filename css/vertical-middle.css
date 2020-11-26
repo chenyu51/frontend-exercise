@@ -1,0 +1,20 @@
+/* 利用margin拉伸盒子，——双盒子模式 */
+.wrapper {
+    width: 200px;
+    height: 300px;
+    border: 1px solid;
+    padding: 10px;
+}
+
+.test {
+    background: red;
+    /* padding: 20px; */
+    height: 100px;
+    /* display: table-cell; */
+    /* vertical-align: middle; */
+    display: block;
+    margin-left: -10px;
+    margin-right: -10px;
+    border: 1px solid green;
+    border-spacing: 20px;
+}
